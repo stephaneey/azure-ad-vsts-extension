@@ -1,16 +1,12 @@
-# azure-ad-vsts-extension
-## Disclaimer
-
-For the time being, the automated provisioning of AAD apps only targets B2E kind of apps. It is not tackling B2C nor B2B (multi-tenant) apps.
-
+# Disclaimer
+For the time being, the automated provisioning of Azure Active Directory Applications only targets B2E kind of applications. It is not tackling B2C nor B2B (multi-tenant) apps.
 ## The custom Visual Studio Team Services task in a nutshell
-In a nutshell, this task was created to automatically provision Azure Active Directory Applications that allow business applications to authorize users and APIs using OAuth2/OpenID. Instead of doing this job manually for each and every business application, it is possible to automate most of these steps as part of the release. However, in order to remain compliant with most enterprise policies, the provisioned configuration remains under the control of the identity and access management team that has to provide the Admin Consent to deployed apps.
+In a nutshell, this task was created to automatically provision Azure Active Directory Applications that allow business applications to authorize users and APIs using OAuth2/OpenID. Instead of doing this job manually for each and every business application, it is possible to automate most of these steps as part of the release life cycle. 
+However, in order to remain compliant with most enterprise policies, the provisioned apps remain under the control of the identity and access management team that has to provide the Admin Consent to the deployed apps.
+Admin Consent is mandatory for all apps that require application permissions while it is optional in some other cases. However, non-consented apps will prompt users as of the first use, which can be annoying with internal employees as internally developed applications should be considered trusted by default. Since the consent part
+is beyond the scope of this task, feel free to handle it your own way.
 
-Admin Consent is mandatory for all apps that require application permissions
-
-Admin Consent is optional in some cases but recommended for internal use. Indeed, consumer apps that are not consented by an admin, emit user-consent prompts which may be annoying in an internal context since all internal developped apps should be trusted by default. User consent might also be confusing for the end user.
-
-## Capabilities of the custom Visual Studio Team Services task
+# Capabilities of the custom Visual Studio Team Services task
 
 * Deploy webapi type of Azure Active Directory Applications
 * Deploy native client type of Azure Active Directory Applications
@@ -18,33 +14,72 @@ Admin Consent is optional in some cases but recommended for internal use. Indeed
 * Deploy custom APIs with custom oauth2Permissions
 * Enable the implicit grant flow
 * Request GroupMembershipClaims
-* Request both Delegate & Application permissions aka the RequiredResourceAccess
-* Generate App Secrets and storing them into Azure Key Vault
-* Enable Managed Service Identity (MSI) for the Service Principal Name (SPN) associated to a given web client
+* Request both Delegate & Application permissions to other resources
+* Generate App Identifiers and App Secrets and store them into Azure Key Vault
+* Grant read access onto provisioned Azure Key Vault secrets to MSI-enabled Azure App Services
 
-All these tasks are performed through an Azure Active Directory Application which is granted the Manage apps that this app creates or owns application permission exposed by the Azure Graph API, and via the Contributor RBAC permission over the Digital Key Vault. 
-Of course, tasks will be performed according to the configuration you provide. A basic consistency check is done at run time to prevent typical errors. In case of configuration error, a corresponding exception will be thrown which will cause the task to fail and will stop the release. However, some checks might also generate warnings so it's always worthwhile to have a look at the logs. 
-An example of warning could be: you request the GroupMembership to contains all the security groups of a given user while the consumer app requires the implicit grant flow (typical use inside of a web browser). However, in such situations, the token will never contain more than 5 groups (by design limitation), which might end up in an improper design choice since users often belong to more than 5 groups.
+# Setup prerequisites
+This documentation assumes that you have no Visual Studio Team Services endpoint configured yet. If you already have some and if you know Visual Studio Team Services, feel free to adjust your existing endpoints with the information provided below.
+## Creation of the Azure Active Directory Application. 
+Once you have enabled this extension into your Visual Studio Team Services account, you have to create an Azure Active Directory Application that will be used by the task in order to authenticate against your directory.
+You must grant it the following application permission:
+![Azure Active Directory Application Permission](/images/aadapp.png "Azure Active Directory Application Permission")
+over your Azure Active Directory tenant. Make sure to create an application secret and to copy its value for later use.
+This will give the task the right of registering applications while not being able to interfere with other apps. The task will use the ClientCredentials flow to connect to Azure Active Directory. You may consider the registration of this App somehow similar to a regular VSTS Service Endpoint. 
+Note that if you already have endpoints registered, you could simply reuse one of the existing Azure Active Directory Applications and give it the above permission. 
+## Granting Contributor Role via Role-Based Access Control aka RBAC
+The task is will be using the Azure Active Directory Application created in the previous step while connecting to Azure Active Directory and will also be using the RBAC Contributor role to connect to the subscription hosting the Key Vault (more on this below): 
+![rbac](/images/rbac.png "rbac")
+In the select textbox, you should enter the application identifier of the app you created.
+## Creation of the Key Vault
+All the application identifier and secrets will be sent to Azure Key Vault by the task. Therefore, you must have a vault and grant the contributor access policy to the Azure Active Directory Application created earlier as shown by the below screenshot:
+![Key vault policy](/images/vaultpolicy.png "Key vault policy")
+## Creation of a Service Account
+When using Access Tokens together with Azure Active Directory V2 PowerShell cmdlets, an account name must be provided to the Connect-AzureAD cmdlet. Therefore, the easiest is to create a service account that is simply a member of the directory.
+## Creation of the VSTS Service Endpoint
+Now that the Azure Active Directory Application has all the required permissions, it is time to register it inside of Visual Studio Team Services by creating a new Service Endpoint. 
+* In VSTS, just go to the Services page. https://yourvstsworkspace/_admin/_services
+* Click on New Service Endpoint ==> Azure Resource Manager ==> at the bottom, click on the link labelled Use the full version of the endpoint dialog and fullfill the form with your own App Id & Secret retrieved from the previous step
+You should endup with something similar to this:
+![service endpoint](/images/endpoint.png "service endpoint")
+You can click on the link labelled Verify connection to see if everything is setup correctly.
+# Recommended actions
+Since the task is supposed to be used across release definitions, it is easier to setup a Variable Group in Visual Studio Team Services where you define the task parameters. These can be overriden at task level should it vary from time to time. While this step is optional, I strongly recommend you to do it. Here is a screenshot of the Variable Group:
+![VSTS Variable Group](/images/vstsgroup.png "VSTS Variable Group")
+Note that I blurred some values for privacy reasons but here is what these variables stand for:
+* tenant: tenant identifier or domain name of your Azure Active Directory
+* vault: name of the Azure Active Directory Key Vault where secrets (app identifers & app secrets) will be stored. Note that you must create this vault before using the task
+* vstsaccount: service account with no specific permission, just an Azure Active Directory member
+* vstsappid: identifier of the Azure Active Directory Application you registered in the previous step 
+* vstsappsecret: secret of the Azure Active Directory Application you registered in the previous step. Make sure to mark this variable as hidden
 
-## Using the custom Visual Studio Team Services task
-Prior to using the task, one must bind the release definition with the Variable Group VSTS. This group contains somme connection information ​to both AAD and Azure Key Vault.
+If you do not create this Variable Group, you'll have to define these values at task level. 
 
-In order to configure the AAD provisioning, one must look for the task named AAD App Provisioning and MSI Automation. The following parameters can/must be configured:
+# Using the custom Visual Studio Team Services task
+## VSTS Agent
+You should use the Hosted 2017 agent. In case you use on-premises agent, I recommend creating a separate Agent Phase using the Hosted 2017 agent. If you do so, feel free to tick the option labelled "Skip download of artifacts".
+## Configuring the task
+Some of the task parameters directly come from the Variable Group created earlier, which means that you must bind this Variable Group to your release definition. They are pre-configured with variable names. You do not need to change anything if you created the Variable Group as explained earlier.
+⋅⋅⋅The task shipps with multiple templates that are intended to cover typical topologies. For instance, when having a mobile app connecting to an Azure-hosted API, your work will only consist in providing the right reply & identifer URLs. Since the input field exposed by the task is merely a textbox, you should use a true JSON editor to configure that part of the task.
 
-* Vault: defaults to $vault .  Contains the name of the Key Vault where to store the secrets
-* VSTS app client id, app secret, tenant, vsts account : leave the defaults. These are used to connect to the target AAD using the permissions depicted earlier. All the values come from the Variable Group. In theory, you should not need to override them. If you deal with multiple tenants (sandbox, prod), then you'd better create another Variable Group then overriding the values at release definition level.
-* AAD Starting Template: pick the template that's the closest to your target topology. The starting template is just to get started with configuration elements. You must update the default provided piece of JSON text with your own values. You'd better use a JSON editor to do so.
-Typical scenarios
+Here is an example of a custom API that exposes custom application and delegate permissions, and its related web client.
 
-The 3 templates currently provided cover most of the scenarios. For instance, when having a mobile app connecting to an Azure-hosted API, your work will only consist in providing the right reply & identifer URLs.  Topologies having 1 web api, 1 web client and/or 1 mobile client are entirely covered. 
+![task configuration](/images/configexample.png "task configuration")
 
-If the amount of clients vary (2 web clients for instance or more than 1 API), the only thing to do is to copy/paste parts of the generated JSON and make sure to update the important parts (reply/identifer URLs).
+Here are some explanations of the above screenshot:
+* The first application "sampleapi" exposes a custom application role and a custom oauth2permission
+* The identifier of the API is reused in the RequiredResourceAccess attribute of the web client. Indeed, the webclient wants to request the MyDelegatePermission scope as well as the role1 application permission.
+* The IsPublicClient attribute indicates whether the Azure Active Directory Application is a native one or not
+* The attribute KeyVaultAppIdName holds the name of the Key Vault secret that stores the idenfifier of the provisioned Azure Active Directory Application. 
+* The attribute KeyVaultAppSecretName holds the name of the Key Vault secret that stores the secret (if any) of the provisioned Azure Active Directory Application. 
+* The attribute MSIEnabledRelatedWebAppName lets the task grant the SPN of the related web application, a GET access policy to the Vault storing the application identifier and secret. 
 
-More advanced scenarios
-More advanced scenarios might come with custom API roles and/or Oauth2Permissions. This is typically used when using role-based permissioning at App level. So, if you share an API across mutliple audiences, you might want to let some users do more than others (ie: visitor, contributor, owner...) and some specific roles/scopes will be injected at runtime by AAD and sent to the API. 
+## Dependencies
+As you noticed, there is a dependency with the Variable Group but there is more. If you use the MSIEnabledRelatedWebAppName attribute, it assumes that you have deployed the corresponding app with MSI enabled in a previous task, as part of the current release. Similarly, the task pushes some information into Key Vault which needs to be fetched by an App Service. Therefore, it is a good practice to define the name of the keyvault secrets as specific release variables that you can reuse across the different tasks of the current release. If you do not use MSI, you still need to push the secret names to the Azure App Service. This can be done through ARM templates. Here is an example of such a sequence within the same release:
 
-The combination of AD Groups/User Assignment at AAD App level where custom roles are associated to groups/Custom roles is also often used to workaround the GroupMembershipClaims limitation depicted earlier.
+![release configuration](/images/releasetasks.png "release configuration")
 
-Also, for S2S calls, exposing different roles enables multiple S2S scenarios with a high granularity.
+where the first task is an ARM template that deploys an App Service with MSI enabled and with the corresponding Key Vault secret names:
 
-For these, feel free to have a look at the template pointer provided earlier.​
+![ARM Template](/images/armtemplate.png "ARM Template")
+
