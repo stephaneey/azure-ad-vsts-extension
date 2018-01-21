@@ -74,6 +74,14 @@ Here are some explanations of the above screenshot:
 * The attribute KeyVaultAppSecretName holds the name of the Key Vault secret that stores the secret (if any) of the provisioned Azure Active Directory Application. 
 * The attribute MSIEnabledRelatedWebAppName lets the task grant the SPN of the related web application, a GET access policy to the Vault storing the application identifier and secret. 
 
+The outcome of the above config ![task configuration](/images/configexample.png "task configuration")
+is that the following Azure Active Directory Applications are registered:
+![provisionedapps](/images/provisionedapps.png "provisioned apps")
+and the web client will be granted the following permissions:
+![webcliperms](/images/webcliperms.png "webclient permssions")
+With 1 delegate permission over Azure Active Directory as well as 1 delegate + 1 application permission over the custom API.
+The application identifier of the webapi as well as the application identifier+secret of the web client will be pushed to Key Vault as shown below:
+![appsinvault](/images/appsinvault.png "App identifiers and secrets pushed to Vault")
 ## Dependencies
 As you noticed, there is a dependency with the Variable Group but there is more. If you use the MSIEnabledRelatedWebAppName attribute, it assumes that you have deployed the corresponding app with MSI enabled in a previous task, as part of the current release. Similarly, the task pushes some information into Key Vault which needs to be fetched by an App Service. Therefore, it is a good practice to define the name of the keyvault secrets as specific release variables that you can reuse across the different tasks of the current release. If you do not use MSI, you still need to push the secret names to the Azure App Service. This can be done through ARM templates. Here is an example of such a sequence within the same release:
 
