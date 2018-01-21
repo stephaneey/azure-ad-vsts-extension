@@ -43,13 +43,13 @@
       ]
     },
     {
-      "name": "sammpleapinativeclient",
+      "name": "sampleapinativeclient",
       "overwrite": true,
-      "RedirectUri": "https://sammpleapinativeclient",
+      "RedirectUri": "https://sampleapinativeclient",
       "IsPublicClient": true,
       "RequiredResourceAccess": [
         {
-          "resource": "https://samplewebapi",
+          "resource": "https://sampleapi",
           "perms": [
             {
               "name": "user_impersonation",
