@@ -2,6 +2,7 @@
   "applications": [
     {
       "name": "sammpleapi",
+      "overwrite": true,
       "RedirectUri": "",
       "IdentifierUri": "https://sammpleapi",
       "IsPublicClient": false,
@@ -12,8 +13,9 @@
     },
     {
       "name": "sammpleapinativeclient",
+      "overwrite": true,
       "RedirectUri": "https://sammpleapinativeclient",
-      "IsPublicClient": true,      
+      "IsPublicClient": true,
       "RequiredResourceAccess": [
         {
           "resource": "https://samplewebapi",
