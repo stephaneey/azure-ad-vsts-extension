@@ -6,8 +6,8 @@ However, in order to remain compliant with most enterprise policies, the provisi
 Admin Consent is mandatory for all apps that require application permissions while it is optional in some other cases. However, non-consented apps will prompt users as of the first use, which can be annoying with internal employees as internally developed applications should be considered trusted by default. Since the consent part
 is beyond the scope of this task, feel free to handle it your own way.
 
-# Capabilities of the custom Visual Studio Team Services task
-
+# Release Notes
+## v1.0
 * Deploy webapi type of Azure Active Directory Applications
 * Deploy native client type of Azure Active Directory Applications
 * Deploy custom APIs with custom application roles
@@ -82,4 +82,3 @@ As you noticed, there is a dependency with the Variable Group but there is more.
 where the first task is an ARM template that deploys an App Service with MSI enabled and with the corresponding Key Vault secret names:
 
 ![ARM Template](/images/armtemplate.png "ARM Template")
-
