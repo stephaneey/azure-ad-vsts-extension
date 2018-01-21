@@ -74,8 +74,7 @@ Here are some explanations of the above screenshot:
 * The attribute KeyVaultAppSecretName holds the name of the Key Vault secret that stores the secret (if any) of the provisioned Azure Active Directory Application. 
 * The attribute MSIEnabledRelatedWebAppName lets the task grant the SPN of the related web application, a GET access policy to the Vault storing the application identifier and secret. 
 
-The outcome of the above config ![task configuration](/images/configexample.png "task configuration")
-is that the following Azure Active Directory Applications are registered:
+The outcome of the above config is that the following Azure Active Directory Applications are registered:
 ![provisionedapps](/images/provisionedapps.png "provisioned apps")
 and the web client will be granted the following permissions:
 ![webcliperms](/images/webcliperms.png "webclient permssions")
