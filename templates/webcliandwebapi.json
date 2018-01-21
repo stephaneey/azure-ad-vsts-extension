@@ -1,0 +1,46 @@
+{
+  "applications": [
+    {
+      "name": "sampleapi",
+      "overwrite": true,
+      "ReplyUrls": "",
+      "IdentifierUri": "https://sampleapi",
+      "IsPublicClient": false,
+      "KeyVaultAppIdName": "sampleapiappidentifiersecretname",
+      "KeyVaultAppSecretName": "",
+      "MSIEnabledRelatedWebAppName": "",
+      "RequiredResourceAccess": {}
+    },
+    {
+      "name": "sampleapiwebcli",
+      "overwrite": true,
+      "IdentifierUri": "https://sampleapiwebcli",
+      "ReplyUrls": [ "https://sampleapiwebcli.azurewebsites.net/" ],
+      "IsPublicClient": false,
+      "KeyVaultAppIdName": "webcliappidentifiersecretname",
+      "KeyVaultAppSecretName": "webcliappsecretsecretname",
+      "MSIEnabledRelatedWebAppName": "",
+      "oauth2AllowImplicitFlow": false,
+      "RequiredResourceAccess": [
+        {
+          "resource": "https://sampleapi",
+          "perms": [
+            {
+              "name": "user_impersonation",
+              "type": "Scope"
+            }
+          ]
+        },
+        {
+          "resource": "https://graph.windows.net",
+          "perms": [
+            {
+              "name": "User.Read",
+              "type": "Scope"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

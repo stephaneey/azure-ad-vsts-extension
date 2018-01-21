@@ -1,0 +1,39 @@
+{
+  "applications": [
+    {
+      "name": "sammpleapi",
+      "RedirectUri": "",
+      "IdentifierUri": "https://sammpleapi",
+      "IsPublicClient": false,
+      "KeyVaultAppIdName": "sampleapiappidentifiersecretname",
+      "KeyVaultAppSecretName": "",
+      "MSIEnabledRelatedWebAppName": "",
+      "RequiredResourceAccess": {}
+    },
+    {
+      "name": "sammpleapinativeclient",
+      "RedirectUri": "https://sammpleapinativeclient",
+      "IsPublicClient": true,      
+      "RequiredResourceAccess": [
+        {
+          "resource": "https://samplewebapi",
+          "perms": [
+            {
+              "name": "user_impersonation",
+              "type": "Scope"
+            }
+          ]
+        },
+        {
+          "resource": "https://graph.windows.net",
+          "perms": [
+            {
+              "name": "User.Read",
+              "type": "Scope"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
