@@ -18,7 +18,7 @@
       "IsPublicClient": true,
       "RequiredResourceAccess": [
         {
-          "resource": "https://samplewebapi",
+          "resource": "https://sammpleapi",
           "perms": [
             {
               "name": "user_impersonation",
