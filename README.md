@@ -28,7 +28,7 @@ over your Azure Active Directory tenant. Make sure to create an application secr
 This will give the task the right of registering applications while not being able to interfere with other apps. The task will use the ClientCredentials flow to connect to Azure Active Directory. You may consider the registration of this App somehow similar to a regular VSTS Service Endpoint. 
 Note that if you already have endpoints registered, you could simply reuse one of the existing Azure Active Directory Applications and give it the above permission. 
 ## Granting Contributor Role via Role-Based Access Control aka RBAC
-The task is will be using the Azure Active Directory Application created in the previous step while connecting to Azure Active Directory and will also be using the RBAC Contributor role to connect to the subscription hosting the Key Vault (more on this below): 
+The task is will be using the Azure Active Directory Application created in the previous step while connecting to Azure Active Directory and will also be using the RBAC "Key Vault Contributor Role" (more on this below): 
 ![rbac](/images/rbac.png "rbac")
 In the select textbox, you should enter the application identifier of the app you created.
 ## Creation of the Key Vault
@@ -60,7 +60,8 @@ If you do not create this Variable Group, you'll have to define these values at 
 You should use the Hosted 2017 agent. In case you use on-premises agent, I recommend creating a separate Agent Phase using the Hosted 2017 agent. If you do so, feel free to tick the option labelled "Skip download of artifacts".
 ## Configuring the task
 Some of the task parameters directly come from the Variable Group created earlier, which means that you must bind this Variable Group to your release definition. They are pre-configured with variable names. You do not need to change anything if you created the Variable Group as explained earlier.
-⋅⋅⋅The task shipps with multiple templates that are intended to cover typical topologies. For instance, when having a mobile app connecting to an Azure-hosted API, your work will only consist in providing the right reply & identifer URLs. Since the input field exposed by the task is merely a textbox, you should use a true JSON editor to configure that part of the task.
+⋅⋅⋅The task shipps with multiple templates that are intended to cover typical topologies. For instance, when having a mobile app connecting to an Azure-hosted API, your work will only consist in providing the right reply & identifer URLs. Since the input field exposed by the task is merely a textbox, you should use a true JSON editor to configure that part of the task. 
+Note that every template is usable "as is" but of course, you should adapt them to your own situation (replyUrls, identifiers etc.). If you are not too sure about how to configure the task, you can test each of the template against a sandbox subscription and look the results in the Azure Portal.
 
 Here is an example of a custom API that exposes custom application and delegate permissions, and its related web client.
 
@@ -82,7 +83,7 @@ With 1 delegate permission over Azure Active Directory as well as 1 delegate + 1
 The application identifier of the webapi as well as the application identifier+secret of the web client will be pushed to Key Vault as shown below:
 ![appsinvault](/images/appsinvault.png "App identifiers and secrets pushed to Vault")
 ## Dependencies
-As you noticed, there is a dependency with the Variable Group but there is more. If you use the MSIEnabledRelatedWebAppName attribute, it assumes that you have deployed the corresponding app with MSI enabled in a previous task, as part of the current release. Similarly, the task pushes some information into Key Vault which needs to be fetched by an App Service. Therefore, it is a good practice to define the name of the keyvault secrets as specific release variables that you can reuse across the different tasks of the current release. If you do not use MSI, you still need to push the secret names to the Azure App Service. This can be done through ARM templates. Here is an example of such a sequence within the same release:
+As you noticed, there is a dependency with the Variable Group but there is more. If you use the MSIEnabledRelatedWebAppName attribute, it assumes that you have deployed the corresponding app with MSI enabled in a previous task, as part of the current release. Similarly, the task pushes some information into Key Vault which needs to be fetched by an App Service. Therefore, it is a good practice to define the name of the keyvault secrets as specific release variables that you can reuse across the different tasks of the current release (this task accepts variable names in the JSON template). If you do not use MSI, you still need to push the secret names to the Azure App Service. This can be done through ARM templates. Here is an example of such a sequence within the same release:
 
 ![release configuration](/images/releasetasks.png "release configuration")
 
