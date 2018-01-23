@@ -29,7 +29,7 @@ This will give the task the right of registering applications while not being ab
 Note that if you already have endpoints registered, you could simply reuse one of the existing Azure Active Directory Applications and give it the above permission. 
 ## Granting Contributor Role via Role-Based Access Control aka RBAC
 The task is will be using the Azure Active Directory Application created in the previous step while connecting to Azure Active Directory and will also be using the RBAC "Key Vault Contributor Role" (more on this below): 
-![rbac](/images/rbac.png "rbac")
+![rbac](/images/rbac2.png "rbac")
 In the select textbox, you should enter the application identifier of the app you created.
 ## Creation of the Key Vault
 All the application identifier and secrets will be sent to Azure Key Vault by the task. Therefore, you must have a vault and grant the contributor access policy to the Azure Active Directory Application created earlier as shown by the below screenshot:
