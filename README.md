@@ -85,29 +85,29 @@ The application identifier of the webapi as well as the application identifier+s
 ## Requesting access to other resources
 When configuring the task, if your API or your client app needs access to another resource, you must input the resource identifier such as "https://graph.windows.net" and the name of the role or scope, such as "User.Read". Here is a recap of the role & scope names for both the Azure AD Graph and the Microsoft Graph API. This will be handy for most of your configurations:
 ### Azure AD Graph delegate permissions
-Id | Permission name
---- | ---
-|a42657d6-7f20-40e3-b6f0-cee03008a62a| Directory.AccessAsUser.All|
-|5778995a-e1bf-45b8-affa-663a9f3f4d04| Directory.Read.All|
-|78c8a3c8-a07e-4b9e-af1b-b5ccab50a175| Directory.ReadWrite.All|
-|970d6fa6-214a-4a9b-8513-08fad511e2fd| Group.ReadWrite.All|
-|6234d376-f627-4f0f-90e0-dff25c5211a3| Group.Read.All|
-|c582532d-9d9e-43bd-a97c-2667a28ce295| User.Read.All|
-|cba73afc-7f69-4d86-8450-4978e04ecd1a| User.ReadBasic.All|
-|311a71cc-e848-46a1-bdf8-97ff7156d8e6| User.Read|
-|2d05a661-f651-4d57-a595-489c91eda336| Member.Read.Hidden|
+Id | Permission name | Description
+--- | --- | ---
+a42657d6-7f20-40e3-b6f0-cee03008a62a| Directory.AccessAsUser.All| Allows the app to have the same access to information in your work or school directory as you do.
+5778995a-e1bf-45b8-affa-663a9f3f4d04| Directory.Read.All| Allows the app to read data in your company or school directory, such as other users, groups and apps.
+78c8a3c8-a07e-4b9e-af1b-b5ccab50a175| Directory.ReadWrite.All| Allows the app to read and write data in your company or school directory, such as other users, groups.  Does not allow user or group deletion on your behalf.
+970d6fa6-214a-4a9b-8513-08fad511e2fd| Group.ReadWrite.All| Allows the app to create groups on your behalf and read all group properties and memberships. Additionally, this allows the app to update group properties and memberships for groups you own.
+6234d376-f627-4f0f-90e0-dff25c5211a3| Group.Read.All| Allows the app to read all group properties and memberships on your behalf.
+c582532d-9d9e-43bd-a97c-2667a28ce295| User.Read.All| Allows the app to read the full set of profile properties of all users in your company or school, on your behalf.  Additionally, this allows the app to read the profiles of your reports and manager.
+cba73afc-7f69-4d86-8450-4978e04ecd1a| User.ReadBasic.All| Allows the app to read a basic set of profile properties of other users in your company or school, on your behalf. Includes display name, first and last name, photo, and email address. Additionally, this allows the app to read basic info about your reports and manager.
+311a71cc-e848-46a1-bdf8-97ff7156d8e6| User.Read| Allows you to sign in to the app with your work account and let the app read your profile. It also allows the app to read basic company information.
+2d05a661-f651-4d57-a595-489c91eda336| Member.Read.Hidden| Allows the app to read the memberships of hidden groups or administrative units on your behalf, for those hidden groups or administrative units that you have access to.
 
 ### Azure AD Graph application permissions
-Id | Permission name
---- | ---
-|5778995a-e1bf-45b8-affa-663a9f3f4d04| Directory.Read.All
-|abefe9df-d5a9-41c6-a60b-27b38eac3efb| Domain.ReadWrite.All
-|78c8a3c8-a07e-4b9e-af1b-b5ccab50a175| Directory.ReadWrite.All
-|1138cb37-bd11-4084-a2b7-9f71582aeddb| Device.ReadWrite.All
-|9728c0c4-a06b-4e0e-8d1b-3d694e8ec207| Member.Read.Hidden
-|824c81eb-e3f8-4ee6-8f6d-de7f50d565b7| Application.ReadWrite.OwnedBy
-|1cda74f2-2616-4834-b122-5cb1b07f8a59| Application.ReadWrite.All
-|aaff0dfd-0295-48b6-a5cc-9f465bc87928| Domain.ReadWrite.All
+Id | Permission name | Description
+--- | --- | ---
+5778995a-e1bf-45b8-affa-663a9f3f4d04| Directory.Read.All| Allows the app to read data in your company or school directory, such as users, groups, and apps.
+abefe9df-d5a9-41c6-a60b-27b38eac3efb| Domain.ReadWrite.All| Allows the app to read and write all domain properties without a signed in user.  Also allows the app to add,  verify and remove domains.
+78c8a3c8-a07e-4b9e-af1b-b5ccab50a175| Directory.ReadWrite.All| Allows the app to read and write data in your company or school directory, such as users, and groups.  Does not allow user or group deletion.
+1138cb37-bd11-4084-a2b7-9f71582aeddb| Device.ReadWrite.All| Allows the app to read and write all device properties without a signed in user.  Does not allow device creation, device deletion or update of device alternative security identifiers.
+9728c0c4-a06b-4e0e-8d1b-3d694e8ec207| Member.Read.Hidden| Allows the app to read the memberships of hidden groups and administrative units without a signed-in user.
+824c81eb-e3f8-4ee6-8f6d-de7f50d565b7| Application.ReadWrite.OwnedBy| Allows the app to create other applications, and fully manage those applications (read, update, update application secrets and delete), without a signed-in user.  It cannot update any apps that it is not an owner of.
+1cda74f2-2616-4834-b122-5cb1b07f8a59| Application.ReadWrite.All| Allows the app to create, read, update and delete applications and service principals without a signed-in user.  Does not allow management of consent grants.
+aaff0dfd-0295-48b6-a5cc-9f465bc87928| Domain.ReadWrite.All| Allows the app to read and write all domain properties without a signed in user.  Also allows the app to add,  verify and remove domains.
 
 ### Microsoft Graph delegate permissions
 Id | Permission name | Description
