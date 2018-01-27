@@ -5,6 +5,8 @@ In a nutshell, this task was created to automatically provision Azure Active Dir
 However, in order to remain compliant with most enterprise policies, the provisioned apps remain under the control of the identity and access management team that has to provide the Admin Consent to the deployed apps.
 Admin Consent is mandatory for all apps that require application permissions while it is optional in some other cases. However, non-consented apps will prompt users as of the first use, which can be annoying with internal employees as internally developed applications should be considered trusted by default. Since the consent part
 is beyond the scope of this task, feel free to handle it your own way.
+# Getting the extension
+You can download the extension to your VSTS tenant here https://marketplace.visualstudio.com/items?itemName=stephane-eyskens.aadv1appprovisioning
 
 # Release Notes
 ## v1.0
