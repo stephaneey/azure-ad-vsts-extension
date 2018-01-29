@@ -5,8 +5,6 @@ In a nutshell, this task was created to automatically provision Azure Active Dir
 However, in order to remain compliant with most enterprise policies, the provisioned apps remain under the control of the identity and access management team that has to provide the Admin Consent to the deployed apps.
 Admin Consent is mandatory for all apps that require application permissions while it is optional in some other cases. However, non-consented apps will prompt users as of the first use, which can be annoying with internal employees as internally developed applications should be considered trusted by default. Since the consent part
 is beyond the scope of this task, feel free to handle it your own way.
-# Getting the extension
-You can download the extension to your VSTS tenant here https://marketplace.visualstudio.com/items?itemName=stephane-eyskens.aadv1appprovisioning
 
 # Release Notes
 ## v1.0
@@ -20,6 +18,10 @@ You can download the extension to your VSTS tenant here https://marketplace.visu
 * Generate App Identifiers and App Secrets and store them into Azure Key Vault
 * Grant read access onto provisioned Azure Key Vault secrets to MSI-enabled Azure App Services
 
+## v1.0.1
+* Added a separate task that handles user and group assignment
+## v1.0.2 & 1.0.3
+* Updated documentation
 # Setup prerequisites
 This documentation assumes that you have no Visual Studio Team Services endpoint configured yet. If you already have some and if you know Visual Studio Team Services, feel free to adjust your existing endpoints with the information provided below.
 ## Creation of the Azure Active Directory Application. 
@@ -27,11 +29,16 @@ Once you have enabled this extension into your Visual Studio Team Services accou
 You must grant it the following application permission:
 ![Azure Active Directory Application Permission](/images/aadapp.png "Azure Active Directory Application Permission")
 over your Azure Active Directory tenant. Make sure to create an application secret and to copy its value for later use.
-This will give the task the right of registering applications while not being able to interfere with other apps. The task will use the ClientCredentials flow to connect to Azure Active Directory. You may consider the registration of this App somehow similar to a regular VSTS Service Endpoint. 
+This will give the task the right of registering applications while not being able to interfere with other apps. Depending on the level of trust between application teams and operation teams within your organization, one
+may also grant the Read and Write directory data permission, which is required to use the User & Group assignment. Unfortunately, this cannot be restricted to your apps only. Therefore, if the identity & access management team wants
+to remain fully in control and has a low risk appetite, you should not grant this permission. The counterpart is that the second task (user and group assignment) will not work without this.
+
+The task will use the ClientCredentials flow to connect to Azure Active Directory. You may consider the registration of this App somehow similar to a regular VSTS Service Endpoint. 
 Note that if you already have endpoints registered, you could simply reuse one of the existing Azure Active Directory Applications and give it the above permission. 
+
 ## Granting Contributor Role via Role-Based Access Control aka RBAC
 The task is will be using the Azure Active Directory Application created in the previous step while connecting to Azure Active Directory and will also be using the RBAC "Key Vault Contributor Role" (more on this below): 
-![rbac](/images/rbac2.png "rbac")
+![rbac](/images/rbac.png "rbac")
 In the select textbox, you should enter the application identifier of the app you created.
 ## Creation of the Key Vault
 All the application identifier and secrets will be sent to Azure Key Vault by the task. Therefore, you must have a vault and grant the contributor access policy to the Azure Active Directory Application created earlier as shown by the below screenshot:
@@ -158,7 +165,7 @@ e1fe6dd8-ba31-4d61-89e7-88639da4683d| User.Read| Allows you to sign in to the ap
 7b9103a5-4610-446b-9670-80643382c1fa| Mail.Read.Shared| Allows the app to read mail you can access, including shared mail.
 5df07973-7d5d-46ed-9847-1271055cbd51| Mail.ReadWrite.Shared| Allows the app to read, update, create, and delete mail you have permission to access, including your own and shared mail. Does not allow the app to send mail on your behalf.
 a367ab51-6b49-43bf-a716-a1fb06d2a174| Mail.Send.Shared| Allows the app to send mail as you or on-behalf of someone else.
-2b9c4092-424d-4249-948d-b43879977640| Calendars.Read.Shared| Allows the app to read events in all calendars that you can access, including delegate and shared calendars. 
+2b9c4092-424d-4249-948d-b43879977640| Calendars.Read.Shared| Allows the app to read events in all calendars that you can access, including delegate and shared calendars. 
 12466101-c9b8-439a-8589-dd09ee67e8e9| Calendars.ReadWrite.Shared| Allows the app to read, update, create and delete events in all calendars in your organization you have permissions to access. This includes delegate and shared calendars.
 242b9d9e-ed24-4d09-9a52-f43769beb9d4| Contacts.Read.Shared| Allows the app to read contacts you have permissions to access, including your own and shared contacts.
 afb6c84b-06be-49af-80bb-8f3f77004eab| Contacts.ReadWrite.Shared| Allows the app to read, update, create, and delete contacts you have permissions to access, including your own and shared contacts.
@@ -190,13 +197,13 @@ dfabfca6-ee36-4db2-8208-7a28381419b3| Notes.Read.All| Allows the app to read all
 bac3b9c2-b516-4ef4-bd3b-c2ef73d8d804| Device.Command| Allows the app to launch another app or communicate with another app on a device that you own.
 818c620a-27a9-40bd-a6a5-d96f7d610b4b| MailboxSettings.ReadWrite| Allows the app to read, update, create, and delete your mailbox settings.
 367492fc-594d-4972-a9b5-0d58c622c91c| UserTimelineActivity.Write.CreatedByApp| Allows the app to report your app activity information to Microsoft Timeline.
-5d186531-d1bf-4f07-8cea-7c42119e1bd9| EduRoster.ReadBasic| Allows the app to view minimal  information about both schools and classes in your organization and education-related information about you and other users on your behalf.
+5d186531-d1bf-4f07-8cea-7c42119e1bd9| EduRoster.ReadBasic| Allows the app to view minimal  information about both schools and classes in your organization and education-related information about you and other users on your behalf.
 a4389601-22d9-4096-ac18-36a927199112| EduRoster.Read| Allows the app to view information about schools and classes in your organization and education-related information about you and other users on your behalf.
 359e19a6-e3fa-4d7f-bcab-d28ec592b51e| EduRoster.ReadWrite| Allows the app to view and modify information about schools and classes in your organization and education-related information about you and other users on your behalf.
 c0b0103b-c053-4b2e-9973-9f3a544ec9b8| EduAssignments.ReadBasic| Allows the app to view your assignments on your behalf without seeing grades.
 2ef770a1-622a-47c4-93ee-28d6adbed3a0| EduAssignments.ReadWriteBasic| Allows the app to view and modify your assignments on your behalf without seeing grades.
 091460c9-9c4a-49b2-81ef-1f3d852acce2| EduAssignments.Read| Allows the app to view your assignments on your behalf including grades.
-2f233e90-164b-4501-8bce-31af2559a2d3| EduAssignments.ReadWrite| Allows the app to view and modify your assignments on your behalf including  grades.
+2f233e90-164b-4501-8bce-31af2559a2d3| EduAssignments.ReadWrite| Allows the app to view and modify your assignments on your behalf including  grades.
 8523895c-6081-45bf-8a5d-f062a2f12c9f| EduAdministration.Read| Allows the app to view the state and settings of all Microsoft education apps on your behalf.
 63589852-04e3-46b4-bae9-15d5b1050748| EduAdministration.ReadWrite| Allows the app to manage the state and settings of all Microsoft education apps on your behalf.
 662ed50a-ac44-4eef-ad86-62eed9be2a29| DeviceManagementServiceConfig.ReadWrite.All| Allows the app to read and write Microsoft Intune service properties including device enrollment and third party service connection configuration.
