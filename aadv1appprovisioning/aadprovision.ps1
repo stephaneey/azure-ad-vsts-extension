@@ -1,4 +1,6 @@
 [CmdletBinding()]
+
+
 param()
 # Disclaimer: this code is provide as is with no warranty of any kind. Use it at your own risks.
 # For more information on the VSTS Task SDK:
@@ -12,6 +14,7 @@ try {
     #collecting input parameters
     $appid=Get-VstsInput -Name vstsappclientid
     $secret=Get-VstsInput -Name vstsappsecret
+    $secret=[System.Web.HttpUtility]::UrlEncode($secret)
     $account=Get-VstsInput -Name vstsaccount
     $tenant=Get-VstsInput -Name tenant
     $vault=Get-VstsInput -Name vault		
@@ -38,6 +41,10 @@ try {
 	{
 		$apps = Get-VstsInput -Name APIWithRolesAndScopesAndWebClient  |ConvertFrom-Json
 	}
+	if($SelectedTemplate -eq"JavascriptAndWebAPI")
+	{
+		$apps = Get-VstsInput -Name JavascriptAndWebAPI  |ConvertFrom-Json
+	}
     #validating input
     if($apps -eq $null -or $apps.Count -eq 0)
     {
@@ -47,10 +54,7 @@ try {
     {
         throw "Some non-native apps require access to resources and do not specify a keyvault secret name"
     } 
-    if($null -ne ($apps.applications |where{$_.IsPublicClient -eq $true -and $_.oauth2AllowImplicitFlow -eq $true}))
-    {
-        throw "Some native apps authorize the oauth2ImplicitFlow which is inconsistent"
-    } 
+   
     if(($apps.applications |where{$_.GroupMembershipClaims -ne $null -and $_.GroupMembershipClaims -ne "" -and $_.GroupMembershipClaims -ne "SecurityGroup" -and $_.GroupMembershipClaims -ne "All"}) -ne $nulll)
     {
         throw "GroupMembershipClaims has a wrong value. Valid values are null, All or SecurityGroup"
@@ -71,13 +75,13 @@ try {
             $GroupMembershipClaims = $app.GroupMembershipClaims
         }
 
-        if($app.oauth2AllowImplicitFlow)
+        if($app.Oauth2AllowImplicitFlow)
         {
-            $Oauth2AllowImplicitFlow=$true;
+            $ImplicitFlow=$true;
         }
         else
         {
-            $Oauth2AllowImplicitFlow=$false;
+            $ImplicitFlow=$false;
         }        
         
         $TargetApp = Get-AzureADApplication -Filter "DisplayName eq '$($app.name)'"
@@ -103,11 +107,11 @@ try {
              {
                 if($ReplyUrls.Count -gt 0)
                 {
-                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -IdentifierUris $app.IdentifierUri -ReplyUrls $ReplyUrls -Oauth2AllowImplicitFlow $Oauth2AllowImplicitFlow -GroupMembershipClaims $GroupMembershipClaims
+                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -IdentifierUris $app.IdentifierUri -ReplyUrls $ReplyUrls -Oauth2AllowImplicitFlow $ImplicitFlow -GroupMembershipClaims $GroupMembershipClaims
                 }
                 else
                 {
-                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -IdentifierUris $app.IdentifierUri -Oauth2AllowImplicitFlow $Oauth2AllowImplicitFlow -GroupMembershipClaims $GroupMembershipClaims
+                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -IdentifierUris $app.IdentifierUri -Oauth2AllowImplicitFlow $ImplicitFlow -GroupMembershipClaims $GroupMembershipClaims
                 }
                 
                 New-AzureADServicePrincipal -AppId $NewApp.AppId
@@ -115,10 +119,10 @@ try {
              else{
                  if($ReplyUrls.Count -gt 0)
                  {
-                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -PublicClient $true -ReplyUrls $ReplyUrls
+                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -PublicClient $true -ReplyUrls $ReplyUrls -Oauth2AllowImplicitFlow $ImplicitFlow
                  }
                  else{
-                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -PublicClient $true
+                    $NewApp = New-AzureADApplication -DisplayName "$($app.name)" -PublicClient $true -Oauth2AllowImplicitFlow $ImplicitFlow
                  }                
              }
              #if it's a web client or a webapi that needs access to other resources, then a passwordCredential is required
@@ -129,7 +133,7 @@ try {
                 $ss1 = ConvertTo-SecureString -String $NewApp.AppId -AsPlainText -Force
                 $out1 = Set-AzureKeyVaultSecret -VaultName $vault -Name $app.KeyVaultAppSecretName -SecretValue $ss
                 $out2 = Set-AzureKeyVaultSecret -VaultName $vault -Name $app.KeyVaultAppIdName -SecretValue $ss1
-				if($app.MSIEnabledRelatedWebAppName -ne $null)
+				if($app.MSIEnabledRelatedWebAppName -ne $null -and $app.MSIEnabledRelatedWebAppName -ne "")
 				{
 					Write-Host "Trying to find MSI principal $($app.MSIEnabledRelatedWebAppName)"
 					$principal = Get-AzureADServicePrincipal -Filter "DisplayName eq '$($app.MSIEnabledRelatedWebAppName)'"
@@ -151,6 +155,12 @@ try {
 					}
 				}					
              }
+			 
+			 if(!$app.IsPublicClient -and $app.RequiredResourceAccess.Length -eq $null -and $app.KeyVaultAppIdName -ne $null -and $app.KeyVaultAppIdName -ne "")
+			 {
+				 $ss1 = ConvertTo-SecureString -String $NewApp.AppId -AsPlainText -Force
+				 $out2 = Set-AzureKeyVaultSecret -VaultName $vault -Name $app.KeyVaultAppIdName -SecretValue $ss1
+			 }
              
              $delegates = $NewApp.Oauth2Permissions
              foreach($delegate in $app.Oauth2Permissions)

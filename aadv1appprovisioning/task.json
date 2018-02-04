@@ -12,8 +12,8 @@
   "demands": [],
   "version": {
     "Major": "1",
-    "Minor": "2",
-    "Patch": "1"
+    "Minor": "0",
+    "Patch": "2"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "Azure Active Directory v1.0 Apps $(message)",
@@ -96,9 +96,10 @@
       "helpMarkDown": "Choose a default template to start from",
       "defaultValue": "NativeAndWebAPI",
       "options": {
-        "NativeAndWebAPI": "1 native app + 1 API",
+        "NativeAndWebAPI": "1 mobile app + 1 API",
+        "JavascriptAndWebAPI": "1 JavaScript app + 1 API",
         "WebAndWebAPI": "1 web client + 1 API",
-        "NativeAndWebAndWebAPI": "1 native app + 1 web client + 1 API",
+        "NativeAndWebAndWebAPI": "1 mobile app + 1 web client + 1 API",
         "APIWithRolesAndScopesAndWebClient": "1 API with custom roles + custom OAuth2 permissions + 1 web client"
       }
     },
@@ -106,16 +107,25 @@
       "name": "NativeAndWebAPI",
       "type": "string",
       "label": "Navite Client+WebAPI",
-      "defaultValue": "{\"applications\":[{ \"name\":\"sampleapi\",\"overwrite\":false,\"ReplyUrls\":\"\",\"IdentifierUri\":\"https://sampleapi\", \"IsPublicClient\":false,\"KeyVaultAppIdName\": \"\",\"KeyVaultAppSecretName\": \"\",\"MSIEnabledRelatedWebAppName\": \"\",\"RequiredResourceAccess\":{}},{\"name\":\"clientofsampleapi\",\"overwrite\":false,\"ReplyUrls\":[\"https://clientofsampleapi\"],\"IsPublicClient\":true,\"RequiredResourceAccess\":[{\"resource\":\"https://sampleapi\",\"perms\":[{\"name\":\"user_impersonation\",\"type\":\"Scope\"}]},{\"resource\":\"https://graph.windows.net\",\"perms\":[{\"name\":\"User.Read\",\"type\":\"Scope\"}]}] }]}",
+      "defaultValue": "{  \"applications\": [    {      \"name\": \"sampleapi\",      \"overwrite\": true,      \"ReplyUrls\": [],      \"IdentifierUri\": \"https://sampleapi\",      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"\",      \"KeyVaultAppSecretName\": \"\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"RequiredResourceAccess\": {}    },    {      \"name\": \"sampleapinativeclient\",      \"overwrite\": true,      \"ReplyUrls\": [\"https://sampleapinativeclient\"],      \"IsPublicClient\": true,      \"RequiredResourceAccess\": [        {          \"resource\": \"https://sampleapi\",          \"perms\": [            {              \"name\": \"user_impersonation\",              \"type\": \"Scope\"            }          ]        },        {          \"resource\": \"https://graph.windows.net\",          \"perms\": [            {              \"name\": \"User.Read\",              \"type\": \"Scope\"            }          ]        }      ]    }  ]}",
       "required": true,
       "helpMarkDown": "Native Client and WebAPI",
       "visibleRule": "TemplateSelector = NativeAndWebAPI"
     },
     {
+      "name": "JavascriptAndWebAPI",
+      "type": "string",
+      "label": "Navite Client+WebAPI",
+      "defaultValue": "{  \"applications\": [    {      \"name\": \"sampleapi\",      \"overwrite\": true,      \"ReplyUrls\": [],      \"IdentifierUri\": \"https://sampleapi\",      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"\",      \"KeyVaultAppSecretName\": \"\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"RequiredResourceAccess\": {}    },    {      \"name\": \"sampleapinativeclient\",      \"overwrite\": true,      \"ReplyUrls\": [\"https://sampleapinativeclient\"],      \"IsPublicClient\": true, \"Oauth2AllowImplicitFlow\": true,     \"RequiredResourceAccess\": [        {          \"resource\": \"https://sampleapi\",          \"perms\": [            {              \"name\": \"user_impersonation\",              \"type\": \"Scope\"            }          ]        },        {          \"resource\": \"https://graph.windows.net\",          \"perms\": [            {              \"name\": \"User.Read\",              \"type\": \"Scope\"            }          ]        }      ]    }  ]}",
+      "required": true,
+      "helpMarkDown": "Native Client and WebAPI",
+      "visibleRule": "TemplateSelector = JavascriptAndWebAPI"
+    },
+    {
       "name": "WebAndWebAPI",
       "type": "string",
       "label": "Web Client+WebAPI",
-      "defaultValue": "{\"applications\":[{\"name\":\"sampleapi\",\"overwrite\":false,\"ReplyUrls\":\"\",\"IdentifierUri\":\"https://sampleapi\",\"IsPublicClient\":false,\"KeyVaultAppIdName\": \"\",\"KeyVaultAppSecretName\": \"\",\"MSIEnabledRelatedWebAppName\": \"\",\"RequiredResourceAccess\":{}},{\"name\":\"sampleapiwebcli\",\"overwrite\":false,\"IdentifierUri\":\"https://sampleapiwebcli\",\"ReplyUrls\":[\"https://sampleapiwebcli\"],\"IsPublicClient\":false,\"KeyVaultAppIdName\": \"\",\"KeyVaultAppSecretName\": \"\",\"MSIEnabledRelatedWebAppName\": \"\",\"RequiredResourceAccess\":[{\"resource\":\"https://sampleapi\",\"perms\":[{\"name\":\"user_impersonation\",\"type\":\"Scope\"}]},{\"resource\":\"https://graph.windows.net\",\"perms\":[{\"name\":\"User.Read\",\"type\":\"Scope\"}]}]}]}",
+      "defaultValue": "{  \"applications\": [    {      \"name\": \"sampleapi\",      \"overwrite\": true,      \"ReplyUrls\": [],      \"IdentifierUri\": \"https://sampleapi\",      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"\",      \"KeyVaultAppSecretName\": \"\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"RequiredResourceAccess\": {}    },    {      \"name\": \"sampleapiwebcli\",      \"overwrite\": true,      \"IdentifierUri\": \"https://sampleapiwebcli\",      \"ReplyUrls\": [ \"https://sampleapiwebcli.azurewebsites.net/\" ],      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"webcliappidentifiersecretname\",      \"KeyVaultAppSecretName\": \"webcliappsecretsecretname\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"Oauth2AllowImplicitFlow\": false,      \"RequiredResourceAccess\": [        {          \"resource\": \"https://sampleapi\",          \"perms\": [            {              \"name\": \"user_impersonation\",              \"type\": \"Scope\"            }          ]        },        {          \"resource\": \"https://graph.windows.net\",          \"perms\": [            {              \"name\": \"User.Read\",              \"type\": \"Scope\"            }          ]        }      ]    }  ]}",
       "required": true,
       "helpMarkDown": "Web client and WebAPI",
       "visibleRule": "TemplateSelector = WebAndWebAPI"
@@ -124,7 +134,7 @@
       "name": "NativeAndWebAndWebAPI",
       "type": "string",
       "label": "Native+Web Client+WebAPI",
-      "defaultValue": "{\"applications\":[{\"name\":\"sampleapi\",\"overwrite\":false,\"ReplyUrls\":\"\",\"IdentifierUri\":\"https://sampleapi\",\"IsPublicClient\":false,\"KeyVaultAppIdName\": \"\",\"KeyVaultAppSecretName\": \"\",\"MSIEnabledRelatedWebAppName\": \"\",\"RequiredResourceAccess\":{}},{\"name\":\"sampleapinativeclient\",\"overwrite\":false,\"ReplyUrls\":\"https://sampleapinativeclient\",\"IsPublicClient\":true,\"RequiredResourceAccess\":[{\"resource\":\"https://sampleapi\",\"perms\":[{\"name\":\"user_impersonation\",\"type\":\"Scope\"}]},{\"resource\":\"https://graph.windows.net\",\"perms\":[{\"name\":\"User.Read\",\"type\":\"Scope\"}]}]},{\"name\":\"sampleapiwebcli\",\"IdentifierUri\":\"https://sampleapiwebcli\",\"ReplyUrls\":\"https://sampleapiwebcli\",\"IsPublicClient\":false,\"KeyVaultAppIdName\": \"\",\"KeyVaultAppSecretName\": \"\",\"MSIEnabledRelatedWebAppName\": \"\",\"RequiredResourceAccess\":[{\"resource\":\"https://sampleapi\",\"perms\":[{\"name\":\"user_impersonation\",\"type\":\"Scope\"}]},{\"resource\":\"https://graph.windows.net\",\"perms\":[{\"name\":\"User.Read\",\"type\":\"Scope\"}]}]}]}",
+      "defaultValue": "{  \"applications\": [    {      \"name\": \"sampleapi\",      \"overwrite\": true,      \"ReplyUrls\": [],      \"IdentifierUri\": \"https://sampleapi\",      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"\",      \"KeyVaultAppSecretName\": \"\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"RequiredResourceAccess\": {}    },    {      \"name\": \"sampleapiwebcli\",      \"overwrite\": true,      \"IdentifierUri\": \"https://sampleapiwebcli\",      \"ReplyUrls\": [ \"https://sampleapiwebcli.azurewebsites.net/\" ],      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"webcliappidentifiersecretname\",      \"KeyVaultAppSecretName\": \"webcliappsecretsecretname\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"Oauth2AllowImplicitFlow\": false,      \"RequiredResourceAccess\": [        {          \"resource\": \"https://sampleapi\",          \"perms\": [            {              \"name\": \"user_impersonation\",              \"type\": \"Scope\"            }          ]        },        {          \"resource\": \"https://graph.windows.net\",          \"perms\": [            {              \"name\": \"User.Read\",              \"type\": \"Scope\"            }          ]        }      ]    },    {      \"name\": \"sampleapinativeclient\",      \"overwrite\": true,      \"ReplyUrls\": [\"https://sampleapinativeclient\"],      \"IsPublicClient\": true,      \"RequiredResourceAccess\": [        {          \"resource\": \"https://sampleapi\",          \"perms\": [            {              \"name\": \"user_impersonation\",              \"type\": \"Scope\"            }          ]        },        {          \"resource\": \"https://graph.windows.net\",          \"perms\": [            {              \"name\": \"User.Read\",              \"type\": \"Scope\"            }          ]        }      ]    }  ]}",
       "required": true,
       "helpMarkDown": "Native Client, Web Client and WebAPI",
       "visibleRule": "TemplateSelector = NativeAndWebAndWebAPI"
@@ -133,7 +143,7 @@
       "name": "APIWithRolesAndScopesAndWebClient",
       "type": "string",
       "label": "API with custom OAuth2 permissions and app roles + web client",
-      "defaultValue": "{\"applications\": [{\"name\": \"sampleapi\",\"overwrite\": true,\"ReplyUrls\": \"\",\"IdentifierUri\": \"https://sampleapi\",\"IsPublicClient\": false,\"KeyVaultAppIdName\": \"\",\"KeyVaultAppSecretName\": \"\",\"MSIEnabledRelatedWebAppName\": \"\",\"GroupMembershipClaims\": null,\"AppRoles\": [{\"DisplayName\": \"role1\",\"Description\": \"role1 example\",\"Value\": \"role1\"}],\"Oauth2Permissions\": [{\"userConsentDescription\": \"This app...\",\"userConsentDisplayName\": \"This app...\",\"value\": \"MyDelegatePermission\"}],\"RequiredResourceAccess\": {}},{\"name\": \"sampleapiwebcli\",\"overwrite\": true,\"IdentifierUri\": \"https://sampleapiwebcli\",\"ReplyUrls\": [ \"https://sampleapiwebcli.azurewebsites.net/\" ],\"IsPublicClient\": false,\"KeyVaultAppIdName\": \"\",\"KeyVaultAppSecretName\": \"\",\"MSIEnabledRelatedWebAppName\": \"\",\"oauth2AllowImplicitFlow\": true,\"RequiredResourceAccess\": [{\"resource\": \"https://sampleapi\",\"perms\": [{\"name\": \"MyDelegatePermission\",\"type\": \"Scope\"},{\"name\": \"role1\",\"type\": \"Role\"}]},{\"resource\": \"https://graph.windows.net\",\"perms\": [{\"name\": \"User.Read\",\"type\": \"Scope\"}]}]}]}",
+      "defaultValue": "{  \"applications\": [    {      \"name\": \"sampleapi\",      \"overwrite\": true,      \"ReplyUrls\": [],      \"IdentifierUri\": \"https://sampleapi\",      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"\",      \"KeyVaultAppSecretName\": \"\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"GroupMembershipClaims\": null,      \"AppRoles\": [        {          \"DisplayName\": \"role1\",          \"Description\": \"role1 example\",          \"Value\": \"role1\"        }      ],      \"Oauth2Permissions\": [        {          \"userConsentDescription\": \"This app...\",          \"userConsentDisplayName\": \"This app...\",          \"value\": \"MyDelegatePermission\"        }      ],      \"RequiredResourceAccess\": {}    },    {      \"name\": \"sampleapiwebcli\",      \"overwrite\": true,      \"IdentifierUri\": \"https://sampleapiwebcli\",      \"ReplyUrls\": [ \"https://sampleapiwebcli.azurewebsites.net/\" ],      \"IsPublicClient\": false,      \"KeyVaultAppIdName\": \"webcliappidentifiersecretname\",      \"KeyVaultAppSecretName\": \"webcliappsecretsecretname\",      \"MSIEnabledRelatedWebAppName\": \"\",      \"Oauth2AllowImplicitFlow\": false,      \"RequiredResourceAccess\": [        {          \"resource\": \"https://sampleapi\",          \"perms\": [            {              \"name\": \"MyDelegatePermission\",              \"type\": \"Scope\"            },            {              \"name\": \"role1\",              \"type\": \"Role\"            }          ]        },        {          \"resource\": \"https://graph.windows.net\",          \"perms\": [            {              \"name\": \"User.Read\",              \"type\": \"Scope\"            }          ]        }      ]    }  ]}",
       "required": true,
       "helpMarkDown": "API with custom OAuth2 permissions and app roles + web client",
       "visibleRule": "TemplateSelector = APIWithRolesAndScopesAndWebClient"
