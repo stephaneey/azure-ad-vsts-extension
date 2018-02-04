@@ -22,6 +22,10 @@ is beyond the scope of this task, feel free to handle it your own way.
 * Added a separate task that handles user and group assignment
 ## v1.0.2 & 1.0.3
 * Updated documentation
+## v1.0.4
+* Fixed a bug: URL encoding of secrets
+## v1.0.5
+* Updated predefined templates
 # Setup prerequisites
 This documentation assumes that you have no Visual Studio Team Services endpoint configured yet. If you already have some and if you know Visual Studio Team Services, feel free to adjust your existing endpoints with the information provided below.
 ## Creation of the Azure Active Directory Application. 
