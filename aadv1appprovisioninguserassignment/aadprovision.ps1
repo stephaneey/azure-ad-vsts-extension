@@ -12,6 +12,7 @@ try {
     #collecting input parameters
     $appid=Get-VstsInput -Name vstsappclientid
     $secret=Get-VstsInput -Name vstsappsecret
+    $secret=[System.Web.HttpUtility]::UrlEncode($secret)
     $account=Get-VstsInput -Name vstsaccount
     $tenant=Get-VstsInput -Name tenant
     $vault=Get-VstsInput -Name vault		
