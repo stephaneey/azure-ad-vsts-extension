@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "aadv1appprovisioning",
   "name": "Azure Active Directory v1.0 App Provisioning",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "publisher": "stephane-eyskens",
   "tags": [
     "Azure Active Directory",
