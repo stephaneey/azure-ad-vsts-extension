@@ -29,7 +29,7 @@
   ],
   "description": "Provision AAD v1.0 Apps, typically B2E scenario",
   "categories": [
-    "Build and release"
+    "Azure Pipelines"
   ],
   "icons": {
     "default": "images/extension-icon.png"
